@@ -10,10 +10,12 @@ mongo = PyMongo(app)
 
 @app.route("/event",methods=["GET","POST"])
 def events_method():
+    result = None
     if request.method == "GET":
-        get_all()
+        result = get_all()
     else:
-        add_new_event()
+        result = add_new_event()
+    return result
 
 def get_all():
     results = mongo.db.event.find({})
@@ -27,12 +29,14 @@ def add_new_event():
 
 @app.route("/event/<ObjectId:id>",methods=["GET","PUT","DELETE"])
 def event_method():
+    result = None
     if request.method=="GET":
-        get_details(id)
+        result = get_details(id)
     elif request.method=="PUT":
-        edit_details(id)
+        result = edit_details(id)
     else:
-        delete_card(id)
+        result = delete_card(id)
+    return result
 
 def get_details(id):
     results = mongo.db.event.find({"_id":id})
