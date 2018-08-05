@@ -12,6 +12,7 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["MONGO_URI"] = "mongodb://meetmon-test:1testaccount@ds249311.mlab.com:49311/meetmon"
 mongo = PyMongo(app)
 
+#test
 @app.route("/event/",methods=["GET","POST"])
 @cross_origin()
 def events_method():
