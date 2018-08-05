@@ -1,14 +1,18 @@
 from flask import Flask,jsonify,request
 import json
 from flask_pymongo import PyMongo
+from flask_cors import CORS, cross_origin
 from bson import ObjectId
 from bson.json_util import dumps
 
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["MONGO_URI"] = "mongodb://meetmon-test:1testaccount@ds249311.mlab.com:49311/meetmon"
 mongo = PyMongo(app)
 
 @app.route("/event",methods=["GET","POST"])
+@cross_origin()
 def events_method():
     result = None
     if request.method == "GET":
@@ -28,6 +32,7 @@ def add_new_event():
 
 
 @app.route("/event/<ObjectId:id>",methods=["GET","PUT","DELETE"])
+@cross_origin()
 def event_method():
     result = None
     if request.method=="GET":
