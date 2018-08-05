@@ -12,6 +12,19 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["MONGO_URI"] = "mongodb://meetmon-test:1testaccount@ds249311.mlab.com:49311/meetmon"
 mongo = PyMongo(app)
 
+def convert_result(mongo_result):
+    mongo_result = list(mongo_result)
+    result = []
+    for item in mongo_result:
+        current_result = {}
+        current_result['_id'] = str(item['_id'])
+        current_result['title'] = item['title']
+        current_result['description'] = item['description']
+        if 'timestamp' in item:
+            current_result['timestamp'] = item['timestamp']
+        result.append(current_result)
+    return jsonify(result)
+
 #test
 @app.route("/event/",methods=["GET","POST"])
 @cross_origin()
@@ -25,7 +38,7 @@ def events_method():
 
 def get_all():
     results = mongo.db.event.find({})
-    return jsonify(json.loads(dumps(results)))
+    return convert_result(results)
 
 def add_new_event():
     data_input = {'title':request.form['title'],'description':request.form['description'],'timestamp':datetime.now()}
@@ -47,7 +60,7 @@ def event_method(id):
 
 def get_details(id):
     results = mongo.db.event.find({"_id":id})
-    return jsonify(json.loads(dumps(results)))
+    return convert_result(results)
 
 def edit_details(id):
     data_input = {'title':request.form['title'],'description':request.form['description']}
