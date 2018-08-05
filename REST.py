@@ -56,4 +56,4 @@ def edit_details(id):
 def delete_card(id):
     condition = {'_id':id}
     result = mongo.db.event.delete_one(condition)
-    return result.deleted_count
+    return jsonify({'count':result.deleted_count})
