@@ -4,6 +4,7 @@ from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
 from bson import ObjectId
 from bson.json_util import dumps
+from datetime import datetime
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -26,7 +27,7 @@ def get_all():
     return jsonify(json.loads(dumps(results)))
 
 def add_new_event():
-    data_input = {'title':request.form['title'],'description':request.form['description']}
+    data_input = {'title':request.form['title'],'description':request.form['description'],'timestamp':datetime.now()}
     result = mongo.db.event.insert_one(data_input)
     return jsonify({'_id':str(result.inserted_id)})
 
