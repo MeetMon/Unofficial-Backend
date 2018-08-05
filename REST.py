@@ -33,7 +33,7 @@ def add_new_event():
 
 @app.route("/event/<ObjectId:id>",methods=["GET","PUT","DELETE"])
 @cross_origin()
-def event_method():
+def event_method(id):
     result = None
     if request.method=="GET":
         result = get_details(id)
