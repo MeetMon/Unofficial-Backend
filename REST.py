@@ -1,21 +1,22 @@
-from flask import Flask,jsonify,request
 import json
+import os
+from flask import Flask,jsonify,request
 from flask_pymongo import PyMongo
 from flask_cors import CORS, cross_origin
 from bson import ObjectId
 from bson.json_util import dumps
 from datetime import datetime
-from flask_uploads import UploadSet, configure_uploads, IMAGES
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 cors = CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["MONGO_URI"] = "mongodb://meetmon-test:1testaccount@ds249311.mlab.com:49311/meetmon"
 mongo = PyMongo(app)
-photos = UploadSet('photos', IMAGES)
 
-app.config['UPLOADED_PHOTOS_DEST'] = 'static'
-configure_uploads(app, photos)
+ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+
+app.config['UPLOAD_FOLDER'] = 'static'
 
 def convert_result(mongo_result):
     mongo_result = list(mongo_result)
@@ -26,13 +27,12 @@ def convert_result(mongo_result):
         current_result['title'] = item['title']
         current_result['description'] = item['description']
         current_result['photo'] = item['photo']
-        if 'timestamp' in item:
-            current_result['timestamp'] = item['timestamp']
+        current_result['timestamp'] = item['timestamp']
         result.append(current_result)
     return jsonify(result)
 
 #test
-@app.route("/event/",methods=["GET","POST"])
+@app.route("/event",methods=["GET","POST"])
 @cross_origin()
 def events_method():
     result = None
@@ -47,8 +47,8 @@ def get_all():
     return convert_result(results)
 
 def add_new_event():
-    
-    data_input = {'title':request.form['title'],'description':request.form['description'],'timestamp':datetime.now(),'photo':photos.save(request.files['photo'])}
+    filename = secure_uploading()
+    data_input = {'title':request.form['title'],'description':request.form['description'],'timestamp':datetime.now(),'photo':filename}
     result = mongo.db.event.insert_one(data_input)
     return jsonify({'_id':str(result.inserted_id)})
 
@@ -79,3 +79,14 @@ def delete_card(id):
     condition = {'_id':id}
     result = mongo.db.event.delete_one(condition)
     return jsonify({'count':result.deleted_count})
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def secure_uploading():
+    file = request.files['photo']
+    if allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return filename
