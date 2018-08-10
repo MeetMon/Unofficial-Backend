@@ -26,7 +26,7 @@ def convert_result(mongo_result):
     return jsonify(result)
 
 #test
-@app.route("/event/",methods=["GET","POST"])
+@app.route("/event",methods=["GET","POST"])
 @cross_origin()
 def events_method():
     result = None
