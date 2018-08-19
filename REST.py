@@ -26,12 +26,11 @@ def convert_result(mongo_result):
         current_result['_id'] = str(item['_id'])
         current_result['title'] = item['title']
         current_result['description'] = item['description']
-        current_result['photo'] = item['photo']
+        current_result['filename'] = item['filename']
         current_result['timestamp'] = item['timestamp']
         result.append(current_result)
     return jsonify(result)
 
-#test
 @app.route("/event",methods=["GET","POST"])
 @cross_origin()
 def events_method():
@@ -47,8 +46,7 @@ def get_all():
     return convert_result(results)
 
 def add_new_event():
-    filename = secure_uploading()
-    data_input = {'title':request.form['title'],'description':request.form['description'],'timestamp':datetime.now(),'photo':filename}
+    data_input = {'title':request.form['title'],'description':request.form['description'],'timestamp':datetime.now(),'filename':request.form['filename']}
     result = mongo.db.event.insert_one(data_input)
     return jsonify({'_id':str(result.inserted_id)})
 
@@ -84,9 +82,11 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def secure_uploading():
-    file = request.files['photo']
+@app.route('/upload',methods=["POST"])
+@cross_origin()
+def upload_file():
+    file = request.files['image']
     if allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return filename
+    return filename
