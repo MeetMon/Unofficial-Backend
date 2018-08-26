@@ -127,7 +127,7 @@ def current_time():
 
 def periodic_deletion():
     while True:
-        time.sleep(60)
+        time.sleep(300)
         mongo.db.event.delete_many({})
         shutil.rmtree('static')
         os.makedirs('static')
