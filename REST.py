@@ -1,5 +1,6 @@
 import json
 import os
+import random
 import shutil
 import time
 from bson import ObjectId
@@ -117,7 +118,7 @@ def vote(id):
 @cross_origin()
 def image_serve(filename):
     if(filename == 'no_image.png'):
-        print(random.choice(os.listdir(app.config['PLACEHOLDER_FOLDER'])))
+        return send_from_directory(app.config['PLACEHOLDER_FOLDER'],random.choice(os.listdir(app.config['PLACEHOLDER_FOLDER'])))
     return send_from_directory(app.config['UPLOAD_FOLDER'], secure_filename(filename))
 
 @app.route('/explode')
