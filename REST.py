@@ -123,12 +123,13 @@ def current_time():
     return {time:COUNTDOWN}
 
 def periodic_deletion():
-    mongo.db.event.delete_many({})
-    shutil.rmtree('static')
-    os.makedirs('static')
+    while True:
+        time.sleep(60)
+        mongo.db.event.delete_many({})
+        shutil.rmtree('static')
+        os.makedirs('static')
 
 @app.before_first_request
 def x():
     thread = Thread(target=periodic_deletion)
     thread.start()
-    thread.join()
