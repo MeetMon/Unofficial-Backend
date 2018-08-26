@@ -1,5 +1,7 @@
 import json
 import os
+import shutil
+import time
 from bson import ObjectId
 from bson.json_util import dumps
 from datetime import datetime
@@ -15,6 +17,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["MONGO_URI"] = "mongodb://meetmon-test:1testaccount@ds249311.mlab.com:49311/meetmon"
 mongo = PyMongo(app)
 
+
+COUNTDOWN = 60
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 BASE_URL = 'http://localhost:5000/'
 IMAGE_SIZE = 500
@@ -84,6 +88,8 @@ def allowed_file(filename):
 @cross_origin()
 def upload_file():
     file = request.files['image']
+    if(file.filename == 'no_image.png'):
+        return file.filename
     if allowed_file(file.filename):
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -98,7 +104,7 @@ def upload_file():
             image.resize((IMAGE_SIZE,height)).save(filepath)
     return filename
 
-@app.route('/vote/<string:method>/<ObjectId:id>',methods=["POST"])
+@app.route('/vote/<string:method>/<ObjectId:id>')
 @cross_origin()
 def vote(id):
     pass
@@ -107,3 +113,20 @@ def vote(id):
 @cross_origin()
 def image_serve(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/explode')
+@cross_origin()
+def current_time():
+    return {time:COUNTDOWN}
+
+def periodic_deletion():
+    mongo.db.event.delete_many({})
+    shutil.rmtree('static')
+    os.makedirs('static')
+
+""" while True:
+    while COUNTDOWN > 0:
+        COUNTDOWN-= 1
+        time.sleep(1)
+    periodic_deletion()
+    COUNTDOWN = 60 """
