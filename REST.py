@@ -19,12 +19,10 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["MONGO_URI"] = "mongodb://meetmon-test:1testaccount@ds249311.mlab.com:49311/meetmon"
 mongo = PyMongo(app)
 
-
-COUNTDOWN = 60
+COUNTDOWN = 300
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 BASE_URL = 'http://localhost:5000/'
 IMAGE_SIZE = 500
-CURRENT_FILE = None
 
 app.config['UPLOAD_FOLDER'] = 'static'
 app.config['PLACEHOLDER_FOLDER'] = 'random'
@@ -114,8 +112,12 @@ def upload_file():
 
 @app.route('/vote/<string:method>/<ObjectId:id>')
 @cross_origin()
-def vote(id):
-    pass
+def vote(method, id):
+    if method == 'up':
+        mongo.db.event.update_one({"_id":id},{'$inc':{'upvotes':1}})
+    elif method == 'down':
+        mongo.db.event.update_one({"_id":id},{'$inc':{'downvotes':1}})
+    return id
 
 @app.route('/image/<string:filename>')
 @cross_origin()
@@ -127,14 +129,18 @@ def image_serve(filename):
 @app.route('/explode')
 @cross_origin()
 def current_time():
-    return {time:COUNTDOWN}
+    return jsonify({'time':COUNTDOWN})
 
 def periodic_deletion():
+    global COUNTDOWN
     while True:
-        time.sleep(300)
+        while COUNTDOWN > 0:
+            time.sleep(1)
+            COUNTDOWN -= 1
         mongo.db.event.delete_many({})
         shutil.rmtree('static')
         os.makedirs('static')
+        COUNTDOWN = 300
 
 @app.before_first_request
 def x():
