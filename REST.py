@@ -92,8 +92,8 @@ def allowed_file(filename):
 @cross_origin()
 def upload_file():
     file = request.files['image']
-    filename = 'no_image.png'
-    if(file.filename == 'no_image.png'):
+    filename = 'no_image'
+    if(file.filename == 'no_image'):
         return filename
     if allowed_file(file.filename):
         filename = secure_filename(file.filename)
@@ -117,7 +117,7 @@ def vote(id):
 @app.route('/image/<string:filename>')
 @cross_origin()
 def image_serve(filename):
-    if(filename == 'no_image.png'):
+    if(filename == 'no_image'):
         return send_from_directory(app.config['PLACEHOLDER_FOLDER'],random.choice(os.listdir(app.config['PLACEHOLDER_FOLDER'])))
     return send_from_directory(app.config['UPLOAD_FOLDER'], secure_filename(filename))
 
