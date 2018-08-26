@@ -9,6 +9,7 @@ from flask import Flask,jsonify,request,send_from_directory
 from flask_cors import CORS, cross_origin
 from flask_pymongo import PyMongo
 from PIL import Image
+from threading import Thread
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -22,6 +23,7 @@ COUNTDOWN = 60
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 BASE_URL = 'http://localhost:5000/'
 IMAGE_SIZE = 500
+CURRENT_FILE = None
 
 app.config['UPLOAD_FOLDER'] = 'static'
 
@@ -88,8 +90,9 @@ def allowed_file(filename):
 @cross_origin()
 def upload_file():
     file = request.files['image']
+    filename = 'no_image.png'
     if(file.filename == 'no_image.png'):
-        return file.filename
+        return filename
     if allowed_file(file.filename):
         filename = secure_filename(file.filename)
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -112,7 +115,7 @@ def vote(id):
 @app.route('/image/<string:filename>')
 @cross_origin()
 def image_serve(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    return send_from_directory(app.config['UPLOAD_FOLDER'], secure_filename(filename))
 
 @app.route('/explode')
 @cross_origin()
@@ -124,9 +127,8 @@ def periodic_deletion():
     shutil.rmtree('static')
     os.makedirs('static')
 
-""" while True:
-    while COUNTDOWN > 0:
-        COUNTDOWN-= 1
-        time.sleep(1)
-    periodic_deletion()
-    COUNTDOWN = 60 """
+@app.before_first_request
+def x():
+    thread = Thread(target=periodic_deletion)
+    thread.start()
+    thread.join()
