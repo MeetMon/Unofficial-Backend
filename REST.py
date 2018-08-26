@@ -58,7 +58,10 @@ def get_all():
     return convert_result(results)
 
 def add_new_event():
-    data_input = {'title':request.form['title'],'timestamp':datetime.now(),'filename':request.form['filename'],'upvotes':1,'downvotes':0}
+    filename = request.form['filename']
+    if (filename == 'no_image'):
+        filename = random.choice(os.listdir(app.config['PLACEHOLDER_FOLDER']))
+    data_input = {'title':request.form['title'],'timestamp':datetime.now(),'filename':filename,'upvotes':1,'downvotes':0}
     result = mongo.db.event.insert_one(data_input)
     return jsonify({'_id':str(result.inserted_id)})
 
@@ -117,8 +120,8 @@ def vote(id):
 @app.route('/image/<string:filename>')
 @cross_origin()
 def image_serve(filename):
-    if(filename == 'no_image'):
-        return send_from_directory(app.config['PLACEHOLDER_FOLDER'],random.choice(os.listdir(app.config['PLACEHOLDER_FOLDER'])))
+    if(filename in os.listdir(app.config['PLACEHOLDER_FOLDER'])):
+        return send_from_directory(app.config['PLACEHOLDER_FOLDER'],filename)
     return send_from_directory(app.config['UPLOAD_FOLDER'], secure_filename(filename))
 
 @app.route('/explode')
