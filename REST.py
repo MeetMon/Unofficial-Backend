@@ -26,6 +26,7 @@ IMAGE_SIZE = 500
 CURRENT_FILE = None
 
 app.config['UPLOAD_FOLDER'] = 'static'
+app.config['PLACEHOLDER_FOLDER'] = 'random'
 
 def convert_result(mongo_result):
     mongo_result = list(mongo_result)
@@ -115,6 +116,8 @@ def vote(id):
 @app.route('/image/<string:filename>')
 @cross_origin()
 def image_serve(filename):
+    if(filename == 'no_image.png'):
+        print(random.choice(os.listdir(app.config['PLACEHOLDER_FOLDER'])))
     return send_from_directory(app.config['UPLOAD_FOLDER'], secure_filename(filename))
 
 @app.route('/explode')
