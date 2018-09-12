@@ -144,5 +144,6 @@ def periodic_deletion():
 
 @app.before_first_request
 def x():
+    print('this is called')
     thread = Thread(target=periodic_deletion)
     thread.start()
