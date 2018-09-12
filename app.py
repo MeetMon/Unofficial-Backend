@@ -117,7 +117,7 @@ def vote(method, id):
         mongo.db.event.update_one({"_id":id},{'$inc':{'upvotes':1}})
     elif method == 'down':
         mongo.db.event.update_one({"_id":id},{'$inc':{'downvotes':1}})
-    return id
+    return jsonify({'id':str(id)})
 
 @app.route('/image/<string:filename>')
 @cross_origin()
