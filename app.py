@@ -21,7 +21,7 @@ mongo = PyMongo(app)
 
 COUNTDOWN = 300
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-BASE_URL = 'http://localhost:5000/'
+BASE_URL = 'http://178.128.216.105:5000/'
 IMAGE_SIZE = 500
 
 app.config['UPLOAD_FOLDER'] = 'static'
