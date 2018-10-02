@@ -19,9 +19,10 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 app.config["MONGO_URI"] = "mongodb://meetmon-test:1testaccount@ds249311.mlab.com:49311/meetmon"
 mongo = PyMongo(app)
 
-COUNTDOWN = 300
+BASE_COUNTDOWN = 86400
+COUNTDOWN =  BASE_COUNTDOWN
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-BASE_URL = 'http://178.128.216.105:5000/'
+BASE_URL = 'http://178.128.62.90:5000/'
 IMAGE_SIZE = 500
 
 app.config['UPLOAD_FOLDER'] = 'static'
@@ -70,8 +71,6 @@ def event_method(id):
     result = None
     if request.method=="GET":
         result = get_details(id)
-    elif request.method=="PUT":
-        result = edit_details(id)
     else:
         result = delete_card(id)
     return result
@@ -140,7 +139,7 @@ def periodic_deletion():
         mongo.db.event.delete_many({})
         shutil.rmtree('static')
         os.makedirs('static')
-        COUNTDOWN = 300
+        COUNTDOWN = BASE_COUNTDOWN
 
 @app.before_first_request
 def x():
