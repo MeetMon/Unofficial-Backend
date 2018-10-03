@@ -53,7 +53,7 @@ def events_method():
     return result
 
 def get_all():
-    results = mongo.db.event.find({})
+    results = mongo.db.event.find({}).sort('upvotes',-1)
     return convert_result(results)
 
 def add_new_event():
