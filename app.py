@@ -22,7 +22,7 @@ mongo = PyMongo(app)
 BASE_COUNTDOWN = 86400
 COUNTDOWN =  BASE_COUNTDOWN
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-BASE_URL = 'http://178.128.62.90:5000/'
+BASE_URL = 'http://198.199.68.6/'
 IMAGE_SIZE = 500
 
 app.config['UPLOAD_FOLDER'] = 'static'
